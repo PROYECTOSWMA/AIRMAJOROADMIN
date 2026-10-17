@@ -1,0 +1,2 @@
+# Mantiene la carpeta public/ en el control de versiones aunque esté vacía.
+# Next.js y el Dockerfile esperan que exista (COPY /app/public ./public).

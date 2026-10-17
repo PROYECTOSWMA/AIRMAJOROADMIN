@@ -1,0 +1,51 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "build:win": "pkg . --targets node18-win-x64 --output dist/api-win.exe",
+    "build:linux": "pkg . --targets node18-linux-x64 --output dist/api-linux",
+    "build": "npm run build:win && npm run build:linux"
+  },
+  "bin": "src/index.js",
+  "pkg": {
+    "scripts": [
+      "src/**/*.js"
+    ],
+    "assets": [
+      "src/templates/**/*.hbs"
+    ],
+    "targets": [
+      "node18-win-x64",
+      "node18-linux-x64"
+    ],
+    "outputPath": "dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.0",
+    "multer": "^2.1.1",
+    "node-fetch": "^2.7.0",
+    "pg": "^8.14.0",
+    "puppeteer": "^24.40.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "pkg": "^5.8.1"
+  }
+}

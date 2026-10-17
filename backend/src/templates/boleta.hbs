@@ -1,0 +1,243 @@
+<!-- /src/templates/boleta.hbs -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            font-size: 10px; 
+            margin: 20px 30px; 
+        }
+        .page { page-break-after: always; }
+        .page:last-child { page-break-after: avoid; }
+        
+        .header { text-align: center; margin-bottom: 20px; }
+        .header img { width: 100%; max-height: 160px; object-fit: contain; }
+
+        .bg-header-celeste { background-color: #A2B9E2; color: black; text-align: center; font-weight: bold; }
+        .bg-body-celeste { background-color: #C2D1EC; color: black; text-align: center; font-weight: bold; }
+
+        .info-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0; }
+        .info-table + .info-table { margin-top: 4px; }
+        .info-table td { border: 1px solid black; padding: 4px 6px; vertical-align: middle; }
+        .info-table .info-cell-center { text-align: center; }
+        .info-table .info-spacer { border: none; }
+
+        .notas-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 9px; }
+        .notas-table th, .notas-table td { border: 1px solid black; padding: 4px; text-align: center; }
+        .promedio-cell { background-color: #d3d3d3; font-weight: bold; }
+        .promedio-final-th { writing-mode: vertical-rl; transform: rotate(180deg); padding: 5px 2px !important; }
+
+        .observaciones-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .observaciones-table td { border: 1px solid black; text-align: center; }
+
+        .firmas-padres-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8px; }
+        .firmas-padres-table td, .firmas-padres-table th { border: 1px solid black; text-align: center; padding: 4px; }
+
+        .footer-signatures { display: flex; justify-content: center; align-items: flex-end; gap: 40px; margin-top: 40px; }
+        .firma-box { width: 28%; }
+        .firma-caja-imagen { border: 1px solid black; height: 60px; position: relative; margin-bottom: 0; border-bottom: none; }
+        .firma-caja-imagen img { max-height: 50px; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); }
+        .firma-caja-texto { border: 1px solid black; padding: 4px; font-size: 10px; }
+        .sello-box { text-align: center; }
+        .sello-box img { height: 90px; }
+    </style>
+</head>
+<body>
+    <!-- AHORA ITERAMOS SOBRE data.boletas -->
+    {{#each data.boletas}}
+    <div class="page">
+        <!-- 1. CABECERA -->
+        <div class="header">
+            <img src="{{this.logo_url}}" alt="Cabecera Boleta">
+        </div>
+        
+        <!-- 2. DATOS DEL ESTUDIANTE Y TUTOR -->
+        <table class="info-table">
+            <colgroup>
+                <col style="width: 14%;"> <col style="width: 43%;"> <col style="width: 5px;">
+                <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 5px;">
+                <col style="width: 10%;"> <col style="width: 8%;">
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td class="bg-header-celeste info-cell-center">ESTUDIANTE</td>
+                    <td>{{this.nombre_completo}}</td>
+                    <td class="info-spacer"></td>
+                    <td class="bg-header-celeste info-cell-center">GRADO</td>
+                    <td class="info-cell-center">{{this.grado}}</td>
+                    <td class="info-spacer"></td>
+                    <td class="bg-header-celeste info-cell-center">N° ORDEN</td>
+                    {{!-- <td class="info-cell-center">{{this.n_orden}}</td> --}}
+                    <td class="info-cell-center"></td> <!-- SE DEJA VACÍO -->
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="info-table">
+            <colgroup>
+                <col style="width: 14%;"> <col style="width: 43%;"> <col style="width: 5px;">
+                <col style="width: 10%;"> <col style="width: 15%;"> <col style="width: 5px;">
+                <col style="width: 10%;"> <col style="width: 8%;">
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td class="bg-header-celeste info-cell-center">TUTOR(A)</td>
+                    <td>{{this.nombre_tutor}}</td>
+                    <td class="info-spacer"></td>
+                    <td class="bg-header-celeste info-cell-center">NIVEL</td>
+                    <td class="info-cell-center">{{this.nivel}}</td>
+                    <td class="info-spacer" colspan="3"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- 3. TABLA DE NOTAS (100% DINÁMICA) -->
+        <table class="notas-table">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="bg-body-celeste" style="width: 20%;">ÁREA</th>
+                    <th rowspan="2" class="bg-body-celeste" style="width: 20%;">SUBÁREA</th>
+                    
+                    <!-- DIBUJA LOS TRIMESTRES DINÁMICAMENTE -->
+                    {{#each @root.data.columnas}}
+                    <th colspan="{{add this.meses.length 1}}" class="bg-body-celeste">{{this.nombre}}</th>
+                    {{/each}}
+
+                    <!-- SI HAY MÁS DE 1 TRIMESTRE, DIBUJA PROMEDIO FINAL -->
+                    {{#if (lookup @root.data.columnas 1)}}
+                    <th rowspan="2" class="bg-body-celeste promedio-final-th" style="width: 4%;">PROM<br>FINAL</th>
+                    {{/if}}
+                </tr>
+                <tr>
+                    <!-- DIBUJA LOS MESES Y COLUMNA "PRO" DE CADA TRIMESTRE -->
+                    {{#each @root.data.columnas}}
+                        {{#each this.meses}}
+                        <th class="bg-body-celeste">{{this.nombre}}</th>
+                        {{/each}}
+                        <th class="bg-body-celeste" style="background-color: #A2B9E2;">PRO</th>
+                    {{/each}}
+                </tr>
+            </thead>
+            <tbody>
+                {{#each this.cursos}}
+                    {{#if this.subareas}}
+                    <tr>
+                        <td style="text-align: left; padding-left: 10px; font-weight: bold;" rowspan="{{this.subareas.length}}">{{this.nombre}}</td>
+                        
+                        {{#with (lookup this.subareas 0)}}
+                            <td style="text-align: left; padding-left: 20px;">{{this.nombre}}</td>
+                            
+                            {{#each @root.data.columnas}}
+                                {{#each this.meses}}
+                                <td>{{lookup ../../notas_boleta (string this.numero)}}</td>
+                                {{/each}}
+                                <td class="promedio-cell">{{lookup ../promedios_periodo (string this.id_periodo)}}</td>
+                            {{/each}}
+
+                            {{#if (lookup @root.data.columnas 1)}}
+                            <td class="promedio-cell">{{this.promedio_final}}</td>
+                            {{/if}}
+                        {{/with}}
+                    </tr>
+
+                    {{#each this.subareas}}
+                        {{#unless @first}}
+                        <tr>
+                            <td style="text-align: left; padding-left: 20px;">{{this.nombre}}</td>
+                            
+                            {{#each @root.data.columnas}}
+                                {{#each this.meses}}
+                                <td>{{lookup ../../notas_boleta (string this.numero)}}</td>
+                                {{/each}}
+                                <td class="promedio-cell">{{lookup ../promedios_periodo (string this.id_periodo)}}</td>
+                            {{/each}}
+
+                            {{#if (lookup @root.data.columnas 1)}}
+                            <td class="promedio-cell">{{this.promedio_final}}</td>
+                            {{/if}}
+                        </tr>
+                        {{/unless}}
+                    {{/each}}
+                    
+                    {{else}}
+                    <tr>
+                        <td style="text-align: left; padding-left: 10px; font-weight: bold;">{{this.nombre}}</td>
+                        <td></td>
+                        
+                        {{#each @root.data.columnas}}
+                            {{#each this.meses}}
+                            <td>{{lookup ../../notas_boleta (string this.numero)}}</td>
+                            {{/each}}
+                            <td class="promedio-cell">{{lookup ../promedios_periodo (string this.id_periodo)}}</td>
+                        {{/each}}
+
+                        {{#if (lookup @root.data.columnas 1)}}
+                        <td class="promedio-cell">{{this.promedio_final}}</td>
+                        {{/if}}
+                    </tr>
+                    {{/if}}
+                {{/each}}
+            </tbody>
+        </table>
+        
+        <!-- 4. OBSERVACIONES -->
+        <table class="observaciones-table">
+            <tr>
+                <td class="bg-body-celeste" style="padding: 4px;">OBSERVACIONES Y/O SUGERENCIAS</td>
+            </tr>
+            <tr>
+                <td style="height: 35px; vertical-align: middle; font-style: italic;">
+                    {{#if this.observacion_tutor}}
+                        {{this.observacion_tutor}}
+                    {{else}}
+                        NO REGISTRA OBSERVACIONES
+                    {{/if}}
+                </td>
+            </tr>
+        </table>
+
+        <!-- 5. FIRMAS DEL PADRE POR MES (100% DINÁMICO) -->
+        <table class="firmas-padres-table">
+            <tr>
+                <th rowspan="2" class="bg-body-celeste" style="width: 18%;">FIRMA DEL PADRE O<br>APODERADO</th>
+                {{#each @root.data.columnas_todas}}
+                    {{#each this.meses}}
+                    <th class="bg-body-celeste">{{this.nombre}}</th>
+                    {{/each}}
+                {{/each}}
+            </tr>
+            <tr>
+                {{#each @root.data.columnas_todas}}
+                    {{#each this.meses}}
+                    <td style="height: 35px;"></td>
+                    {{/each}}
+                {{/each}}
+            </tr>
+        </table>
+
+        <!-- 6. FIRMAS INSTITUCIONALES -->
+        <div class="footer-signatures">
+            <div class="firma-box">
+                <div class="firma-caja-imagen">
+                    {{#if this.firma_director_url}}<img src="{{this.firma_director_url}}" alt="Firma Directora">{{/if}}
+                </div>
+                <div class="firma-caja-texto bg-body-celeste">FIRMA DE DIRECTORA</div>
+            </div>
+            <div class="sello-box">
+                {{#if this.sello_url}}<img src="{{this.sello_url}}" alt="Sello Colegio">{{/if}}
+            </div>
+            <div class="firma-box">
+                <div class="firma-caja-imagen">
+                    {{#if this.firma_tutor_url}}<img src="{{this.firma_tutor_url}}" alt="Firma Tutor">{{/if}}
+                </div>
+                <div class="firma-caja-texto bg-body-celeste">FIRMA DE TUTOR(A)</div>
+            </div>
+        </div>
+
+    </div>
+    {{/each}}
+</body>
+</html>

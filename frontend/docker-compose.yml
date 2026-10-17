@@ -1,0 +1,12 @@
+services:
+  frontend_air_majoro_prod:
+    build:
+      context: .
+      args:
+        # URL pública del tablero embebido (nginx -> 127.0.0.1:8081).
+        # Se incrusta en el build del frontend.
+        NEXT_PUBLIC_BI_DASHBOARD_URL: "https://dashboardaim.wmasystems.com"
+    container_name: frontend-airmajoro-prod
+    restart: always
+    ports:
+      - "127.0.0.1:3008:3000"

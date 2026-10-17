@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Archivos de entorno - ¡MUY IMPORTANTE PARA LA SEGURIDAD!
+.env
+
+# Archivos de log
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de guía de estilo
+semantic_guide.txt
+
+# Archivos de distribución
+dist/
